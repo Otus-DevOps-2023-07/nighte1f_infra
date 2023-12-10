@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 service_account_key_file = "urpathtokey"
 folder_id = "urfolderid"
+=======
+service_account_key_file = "ur path to key"
+folder_id = "ur folder id"
+>>>>>>> 6559b9f58e914e78b51ac6fdab9445892601bb74
 source_image_family = "ubuntu-1604-lts"
 ssh_username = "ubuntu"
