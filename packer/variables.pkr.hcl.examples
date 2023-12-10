@@ -1,4 +1,4 @@
-service_account_key_file = "ur path to key"
-folder_id = "ur folder id"
+service_account_key_file = "urpathtokey"
+folder_id = "urfolderid"
 source_image_family = "ubuntu-1604-lts"
 ssh_username = "ubuntu"
