@@ -1,0 +1,31 @@
+{
+  "builders": [
+    {
+              "type": "yandex",
+              "service_account_key_file": "{{user `service_account_key_file`}}",
+              "folder_id": "{{user `folder_id`}}",
+              "source_image_family": "{{user `source_image_family`}}",
+              "image_name": "reddit-basejson-Q${formatdate(\"MM-DD-YYYY\", timestamp())}",
+              "image_family": "reddit-basejson",
+              "ssh_username": "{{user `ssh_username`}}",
+              "platform_id": "standard-v1",
+              "use_ipv4_nat": true
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+                "echo 'updating APT'",
+                "sudo apt-get update -y",
+                "sleep 10",
+                "echo 'install ruby'",
+                "sudo apt-get install -y ruby-full ruby-bundler build-essential",
+                "sleep 10",
+                "echo 'install mongodb'",
+                "sudo apt-get install -y mongodb",
+                "sudo systemctl enable mongodb"
+      ]
+    }
+  ]
+}
