@@ -50,9 +50,9 @@ yc compute instance create \
 
 # Homework 5
 
-Created service account for YC
-Created image with using packer
-Created VM with this image
+- Created service account for YC
+- Created image with using packer
+- Created VM with this image
 
 # PROBLEMS:
 - yandex: Error creating network
