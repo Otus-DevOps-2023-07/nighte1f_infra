@@ -1,0 +1,8 @@
+cloud_id                 = "CloudID"
+folder_id                = "FolderID"
+zone                     = "Zone to deploy. Default:ru-central1-a"
+public_key_path          = "path/to/key.pub"
+private_key_path         = "path/to/private.key"
+image_id                 = "ImageID"
+subnet_id                = "SubnetID"
+service_account_key_file = "/path/to/terrakey.json"
