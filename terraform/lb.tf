@@ -1,6 +1,6 @@
 resource "yandex_lb_network_load_balancer" "reddit" {
   name = "lb-reddit"
-  deletion_protection = "false"
+  #deletion_protection = "false"
   listener {
     name = "reddit-listener"
     port = 9292
