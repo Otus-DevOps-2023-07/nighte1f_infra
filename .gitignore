@@ -1,0 +1,10 @@
+# ingonring this files
+
+variables.pkr.hcl
+variables.json
+
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
