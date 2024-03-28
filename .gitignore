@@ -8,3 +8,7 @@ variables.json
 *.tfstate.backup
 *.tfvars
 .terraform/
+
+terraform.tfvars
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
