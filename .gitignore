@@ -11,5 +11,5 @@ variables.json
 .terraform/
 
 terraform.tfvars
-.terraform.lock.hcl
-.terraform.tfstate.lock.info
+*.terraform.lock.hcl
+*.terraform.tfstate.lock.info
