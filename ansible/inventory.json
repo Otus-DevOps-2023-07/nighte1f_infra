@@ -1,0 +1,19 @@
+{
+    "_meta": {
+        "hostvars": {}
+    },
+    "app": {
+        "hosts": ["51.250.8.20"],
+        "vars": {
+            "ansible_user": "ubuntu",
+            "ansible_private_key_file": "~/.ssh/ubuntu"
+        }
+    },
+    "db": {
+        "hosts": ["51.250.89.119"],
+        "vars": {
+            "ansible_user": "ubuntu",
+            "ansible_private_key_file": "~/.ssh/ubuntu"
+        }
+    }
+}

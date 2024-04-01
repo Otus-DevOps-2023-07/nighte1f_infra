@@ -90,26 +90,35 @@ solution: need add "sleep" after commands
 - Правка outputs.tf
 - При создании сети пришлось удалить дефолтную сеть, т.к. действует лимит (написано обращение в тп)
 - Подготовлены образы через пакер
-    packer validate -var-file=variables.pkr.hcl app.pkr.hcl
+    ```
+	packer validate -var-file=variables.pkr.hcl app.pkr.hcl
     packer validate -var-file=variables.pkr.hcl db.pkr.hcl
     packer build -var-file=variables.pkr.hcl app.pkr.hcl
     packer build -var-file=variables.pkr.hcl db.pkr.hcl
+	```
 - Конфигурация разбита на отдельные файлы
     для проверки заходим на хосты и проверяем наличии руби и монгодб
+	```
 	ssh -i ~/.ssh/appuser ubuntu@'hostip'
 	ruby -v
 	systemctl status mongodb
+	```
 
 - Созданы модули
     В каждый модуль добавлен config.tf с провайдером яндекса
 - Удалены конфигурации из основного каталога
 - Отформатированы конфигурации
+	```
 	terraform fmt
+	```
 
 Создан S3 бакет для хранения состояния
 	Создаём ключи
+	```
 	yc iam access-key create --service-account-name terraform-sa
+	```
 	Добавляем переменные
+	```
 	variable access_key {
 	description = "key id"
 	}
@@ -119,8 +128,10 @@ solution: need add "sleep" after commands
 	variable bucket_name {
 	  description = "bucket name"
 	}
+	```
 
 	В каталоге terraform создаем конфиг бакета storage-backet.tf
+	```
 	provider "yandex" {
 	  version                  = "~> 0.43"
 	  service_account_key_file = var.service_account_key_file
@@ -135,11 +146,15 @@ solution: need add "sleep" after commands
 	  secret_key    = var.secret_key
 	  force_destroy = "true"
 	}
+	```
 
 	Запускаем его создание
+	```
 	terraform apply
+	```
 
 - В каждой из сред создаем backend.tf для указания бекэнда
+	```
 	terraform {
 	  backend "s3" {
 		endpoint   = "storage.yandexcloud.net"
@@ -151,15 +166,21 @@ solution: need add "sleep" after commands
 		skip_credentials_validation = true
 	   }
 	}
+	```
 	Запускаем
+	```
 	terraform init -backend-config="access_key='KEY'" -backend-config="secret_key='SECRET'"
+	```
 	Переносим кофиги и повторно запускаем
+	```
 	terraform init -backend-config="access_key='KEY'" -backend-config="secret_key='SECRET'" -reconfigure
+	```
 	Блокировки работают
 
 - Создаем деплой приложения
 	В каждом из модулей создать каталог files где будут хранится наши конфиги и скрипты
 	Создаем темплейт puma.service.tmpl конфига для нашего приложения добавив адресс для подключения к базе
+	```
 	[Unit]
 	Description=Puma HTTP Server
 	After=network.target
@@ -174,8 +195,10 @@ solution: need add "sleep" after commands
 
 	[Install]
 	WantedBy=multi-user.target
+	```
 
 	Теперь модифицируем main.tf добавив провижионеры
+	```
 	 connection {
 		type        = "ssh"
 		host        = yandex_compute_instance.app.network_interface[0].nat_ip_address
@@ -191,12 +214,16 @@ solution: need add "sleep" after commands
 	 provisioner "remote-exec" {
 		script = "${path.module}/files/deploy.sh"
 	  }
+	  ```
 
 	 Описываем переменную db_ip
+	 ```
 	 variable db_ip {
 	  description = "database IP"
 	}
+	```
 	Добавляем в main.tf
+	```
 	module "app" {
 	  source          = "../modules/app"
 	  public_key_path = var.public_key_path
@@ -205,13 +232,17 @@ solution: need add "sleep" after commands
 	  subnet_id       = var.subnet_id
 	  db_ip           = module.db.db_internal_ip
 	}
+	```
 
 	Добавляем в db/outputs.ff вывод внутреннего ip
+	```
 	output "db_internal_ip" {
 	  value = yandex_compute_instance.db.network_interface.0.ip_address
 	}
+	```
 
 	Добавляем провижионеры в наш файл в db main.tf
+	```
 	connection {
 		type        = "ssh"
 		host        = yandex_compute_instance.db.network_interface[0].nat_ip_address
@@ -223,13 +254,67 @@ solution: need add "sleep" after commands
 	  provisioner "remote-exec" {
 		script = "${path.module}/files/deploy.sh"
 	  }
+	  ```
 
 - Для запуска проекта:
 	Создаем бакет
 	В каталоге terraform
+		```
 		terraform apply
+		```
 	В необходимой среде
+		```
 		terraform apply
+		```
 
 - Проверка работоспособности
 	'полученный внешний адрес приложения':9292
+
+
+# Homework 8
+- Создана новая ветка
+- Установлен ансибл
+- Поднята инфра stage
+- Созданы inventory
+- Создан файл конфига ансибл
+- Создан плейбук
+- С серверов инфры удалены пакеты с питоном 3.5 и установлены с питоном 2.7
+	для этого в деплои модулей добавлено следующее
+		```
+		sudo apt remove python3.5-minimal -y
+		sudo install python
+		```
+
+- Создан inventory.json
+	```
+	{
+		"_meta": {
+			"hostvars": {}
+		},
+		"app": {
+			"hosts": ["51.250.8.20"],
+			"vars": {
+				"ansible_user": "ubuntu",
+				"ansible_private_key_file": "~/.ssh/ubuntu"
+			}
+		},
+		"db": {
+			"hosts": ["51.250.89.119"],
+			"vars": {
+				"ansible_user": "ubuntu",
+				"ansible_private_key_file": "~/.ssh/ubuntu"
+			}
+		}
+	}
+	```
+
+- Создан скрипт, который парсит вывод yc compute instance list
+- Изменён ansible.cfg
+	```
+	inventory = ./dynamicinv.sh
+	```
+
+- Для проверки задания:
+	```
+	ansible all -m ping
+	```
