@@ -112,7 +112,7 @@ solution: need add "sleep" after commands
 	terraform fmt
 	```
 
-Создан S3 бакет для хранения состояния
+- Создан S3 бакет для хранения состояния
 	Создаём ключи
 	```
 	yc iam access-key create --service-account-name terraform-sa
@@ -199,27 +199,27 @@ solution: need add "sleep" after commands
 
 	Теперь модифицируем main.tf добавив провижионеры
 	```
-	 connection {
+	connection {
 		type        = "ssh"
 		host        = yandex_compute_instance.app.network_interface[0].nat_ip_address
 		user        = "ubuntu"
 		agent       = false
 		private_key = file(var.private_key_path)
-	  }
-	 provisioner "file" {
+	}
+	provisioner "file" {
 		content     = templatefile("${path.module}/files/puma.service.tmpl", { db_ip = var.db_ip})
 		destination = "/tmp/puma.service"
-	  }
+	}
 
-	 provisioner "remote-exec" {
+	provisioner "remote-exec" {
 		script = "${path.module}/files/deploy.sh"
-	  }
-	  ```
+	}
+	```
 
 	 Описываем переменную db_ip
-	 ```
-	 variable db_ip {
-	  description = "database IP"
+	```
+	variable db_ip {
+		description = "database IP"
 	}
 	```
 	Добавляем в main.tf
@@ -318,3 +318,102 @@ solution: need add "sleep" after commands
 	```
 	ansible all -m ping
 	```
+
+# Homework 9
+- Создана новая ветка
+- Закомменчен код для провижнов в терраформе
+- Протестированы один плейбук, один сценарий:
+	Плейбуки
+    Сценарий плейбука
+    Сценарий для MongoDB
+    Шаблон конфига MongoDB
+    Пробный, тестовый прогон
+		ansible-playbook reddit_app.yml --check
+        ansible-playbook reddit_app.yml --check --limit db
+    Определение переменных
+    Корректировка 2-х темплейтов для mongod и mongodb
+    Пробный прогон
+    Handlers
+    Добавлены handlers
+    Применим плейбук
+        ansible-playbook  reddit_app.yml  --limit db
+    Настройка инстанса приложения
+    Unit для приложения
+    Добавлен шаблон для приложения
+    Настройка инстанса приложения
+		ansible-playbook reddit_app.yml --check --limit db --tags db-tag
+		ansible-playbook reddit_app.yml --check --limit app --tags app-tag
+		ansible-playbook reddit_app.yml --limit app --tags app-tag
+	Деплой
+    Выполняем деплой
+		ansible-playbook reddit_app.yml --check --limit app --tags deploy-tag
+		ansible-playbook reddit_app.yml --limit app --tags deploy-tag
+    Проверяем работу приложения
+
+- Протестированы один плейбук, много сценариев
+    Пересоздадим инфраструктуру
+    Проверим работу сценариев
+        ansible-playbook reddit_app2.yml --tags db-tag --check
+        ansible-playbook reddit_app2.yml --tags db-tag
+        ansible-playbook reddit_app2.yml --tags app-tag --check
+        ansible-playbook reddit_app2.yml --tags app-tag
+    Сценарий для деплоя
+        ansible-playbook reddit_app2.yml --tags app-tag
+    Проверка сценария
+        ansible-playbook reddit_app2.yml --tags deploy-tag --check
+
+- Несколько плейбуков
+	db.yml
+    app.yml
+    deploy.yml
+    site.yml
+    Проверка результата
+        ansible-playbook site.yml --check
+        ansible-playbook site.yml
+
+- Созданы новые образы при помощи пакера
+	Изменен провижн образов Packer на Ansible-плейбуки
+        ```
+		ansible-playbook --check packer_db.yml
+        ansible-playbook --check packer_app.yml
+		```
+	Интегрируем Ansible в Packer
+    Проверяем образы
+		```
+		packer validate -var-file=variables.pkr.hcl db.pkr.hcl
+        packer validate -var-file=variables.pkr.hcl app.pkr.hcl
+		```
+	Для настройки плагина понадобилось добавить в config.hcl информацию о плагине ансибла
+		```
+		packer init -var-file=variables.pkr.hcl app.pkr.hcl
+		packer validate -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
+		packer validate -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
+		```
+	Так же ансибл ругался на версию питона на хосте, через шелл был установлен питон 2 и указано его использование
+		```
+		extra_arguments = [
+			"--extra-vars",
+			"ansible_python_interpreter=/usr/bin/python2.7"]
+		```
+	Помогло но не совсем, поэтому на своей вм был удалён ансибл и установлен через apt, после этого образ стал корректно работать
+		```
+		packer build -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
+        packer build -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
+		yc compute image list
+		```
+	Меняем id образов в переменных терраформа и запускаем создание инфры
+		```
+		terraform/stage> terraform destroy
+        terraform/stage> terraform apply -auto-approve
+		```
+	Проверяем работу плейбука
+		```
+		ansible-playbook site.yml --check
+		```
+	Выдает ошибку, т.к. нет сервиса пумы, но при применении плейбука всё отрабатывает
+		```
+		ansible-playbook site.yml
+		```
+
+- Проверяем работу
+	'внешний адрес':9292

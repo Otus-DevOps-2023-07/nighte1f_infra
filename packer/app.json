@@ -14,14 +14,8 @@
   ],
   "provisioners": [
     {
-      "type": "shell",
-      "inline": [
-                "echo 'updating APT'",
-                "sudo apt-get update -y",
-                "sleep 10",
-                "echo 'install ruby'",
-                "sudo apt-get install -y ruby-full ruby-bundler build-essential"
-      ]
+     "type": "ansible",
+     "playbook_file": "ansible/packer_app.yml"
     }
-  ]
+ ]
 }

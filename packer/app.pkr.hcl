@@ -39,10 +39,22 @@ build {
   provisioner "shell" {
     inline = [
       "echo 'updating APT'",
-      "sudo apt-get update -y",
-      "sleep 10",
-      "echo 'install ruby'",
-      "sudo apt-get install -y ruby-full ruby-bundler build-essential"
+      "sleep 20",
+      "sudo add-apt-repository -y ppa:jblgf0/python",
+      "sleep 20",
+      "sudo apt-get update",
+      "sleep 30",
+      "sudo apt-get install python3.6 -y",
+      "python3 --version",
+      "sudo apt-get install python -y",
+      "python --version",
     ]
+  }
+  provisioner "ansible" {
+    playbook_file = "ansible/packer_app.yml"
+    extra_arguments = [
+      "--extra-vars",
+      "ansible_python_interpreter=/usr/bin/python2.7"]
+    use_proxy = false
   }
 }

@@ -24,20 +24,21 @@ resource "yandex_compute_instance" "app" {
   ssh-keys = "ubuntu:${file(var.public_key_path)}"
   }
 
-  connection {
-    type        = "ssh"
-    host        = self.network_interface.0.nat_ip_address
-    user        = "ubuntu"
-    agent       = false
-    private_key = file(var.private_key)
-  }
+# commeted fpr hw9
+  # connection {
+  #   type        = "ssh"
+  #   host        = self.network_interface.0.nat_ip_address
+  #   user        = "ubuntu"
+  #   agent       = false
+  #   private_key = file(var.private_key)
+  # }
 
-  provisioner "file" {
-    content     = templatefile("${path.module}/files/puma.service.tmpl", { db_ip = var.db_ip})
-    destination = "/tmp/puma.service"
-  }
+  # provisioner "file" {
+  #   content     = templatefile("${path.module}/files/puma.service.tmpl", { db_ip = var.db_ip})
+  #   destination = "/tmp/puma.service"
+  # }
 
-  provisioner "remote-exec" {
-    script = "${path.module}/files/deploy.sh"
-  }
+  # provisioner "remote-exec" {
+  #   script = "${path.module}/files/deploy.sh"
+  # }
 }
