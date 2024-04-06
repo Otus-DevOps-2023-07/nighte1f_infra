@@ -1,5 +1,5 @@
 {
- "service_account_key_file": "key.json.example",
+ "service_account_key_file": "packer/key.json.example",
  "folder_id": "urfolderid",
  "source_image_family": "ubuntu-1604-lts",
  "ssh_username": "ubuntu"
