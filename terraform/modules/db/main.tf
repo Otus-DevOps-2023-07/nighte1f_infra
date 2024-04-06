@@ -23,15 +23,17 @@ resource "yandex_compute_instance" "db" {
   metadata = {
   ssh-keys = "ubuntu:${file(var.public_key_path)}"
   }
-  connection {
-    type        = "ssh"
-    host        = yandex_compute_instance.db.network_interface[0].nat_ip_address
-    user        = "ubuntu"
-    agent       = false
-    private_key = file(var.private_key)
-  }
 
-  provisioner "remote-exec" {
-    script = "${path.module}/files/deploy.sh"
-  }
+# commented for hw9
+  # connection {
+  #   type        = "ssh"
+  #   host        = yandex_compute_instance.db.network_interface[0].nat_ip_address
+  #   user        = "ubuntu"
+  #   agent       = false
+  #   private_key = file(var.private_key)
+  # }
+
+  # provisioner "remote-exec" {
+  #   script = "${path.module}/files/deploy.sh"
+  # }
 }

@@ -2,10 +2,10 @@
 
 if [[ $1 == "--list" ]]; then
     # Commented for test pass
-    # apphost=$(yc compute instance list | grep "reddit-app" | awk {'print $10'})
-    # dbhost=$(yc compute instance list | grep "reddit-db" | awk {'print $10'})
-    apphost="51.250.8.20"
-    dbhost="51.250.89.119"
+    apphost=$(yc compute instance list | grep "reddit-app" | awk {'print $10'})
+    dbhost=$(yc compute instance list | grep "reddit-db" | awk {'print $10'})
+    # apphost="62.84.118.162"
+    # dbhost="158.160.63.158"
 
     cat <<EOT
 {

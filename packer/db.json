@@ -14,15 +14,8 @@
   ],
   "provisioners": [
     {
-      "type": "shell",
-      "inline": [
-                "echo 'updating APT'",
-                "sudo apt-get update -y",
-                "sleep 10",
-                "echo 'install mongodb'",
-                "sudo apt-get install -y mongodb",
-                "sudo systemctl enable mongodb"
-      ]
-    }
+      "type": "ansible",
+      "playbook_file": "ansible/packer_db.yml"
+     }
   ]
 }
