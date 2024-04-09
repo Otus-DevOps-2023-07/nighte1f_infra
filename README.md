@@ -323,44 +323,65 @@ solution: need add "sleep" after commands
 - Создана новая ветка
 - Закомменчен код для провижнов в терраформе
 - Протестированы один плейбук, один сценарий:
+
 Плейбуки
+
 Сценарий плейбука
+
 Сценарий для MongoDB
+
 Шаблон конфига MongoDB
+
 Пробный, тестовый прогон
+	```
 	ansible-playbook reddit_app.yml --check
 	ansible-playbook reddit_app.yml --check --limit db
+	```
 Определение переменных
+
 Корректировка 2-х темплейтов для mongod и mongodb
+
 Пробный прогон
 Handlers
 Добавлены handlers
 Применим плейбук
+	```
 	ansible-playbook  reddit_app.yml  --limit db
+	```
 Настройка инстанса приложения
 Unit для приложения
 Добавлен шаблон для приложения
 Настройка инстанса приложения
+	```
 	ansible-playbook reddit_app.yml --check --limit db --tags db-tag
 	ansible-playbook reddit_app.yml --check --limit app --tags app-tag
 	ansible-playbook reddit_app.yml --limit app --tags app-tag
+	```
 Деплой
 Выполняем деплой
+	```
 	ansible-playbook reddit_app.yml --check --limit app --tags deploy-tag
 	ansible-playbook reddit_app.yml --limit app --tags deploy-tag
+	```
 Проверяем работу приложения
 
 - Протестированы один плейбук, много сценариев
 Пересоздадим инфраструктуру
 Проверим работу сценариев
+	```
 	ansible-playbook reddit_app2.yml --tags db-tag --check
 	ansible-playbook reddit_app2.yml --tags db-tag
 	ansible-playbook reddit_app2.yml --tags app-tag --check
 	ansible-playbook reddit_app2.yml --tags app-tag
+	```
 Сценарий для деплоя
+	```
 	ansible-playbook reddit_app2.yml --tags app-tag
+	```
 Проверка сценария
+	```
 	ansible-playbook reddit_app2.yml --tags deploy-tag --check
+	```
 
 - Несколько плейбуков
 db.yml
@@ -368,8 +389,10 @@ app.yml
 deploy.yml
 site.yml
 Проверка результата
+	```
 	ansible-playbook site.yml --check
 	ansible-playbook site.yml
+	```
 
 - Созданы новые образы при помощи пакера
 Изменен провижн образов Packer на Ansible-плейбуки
