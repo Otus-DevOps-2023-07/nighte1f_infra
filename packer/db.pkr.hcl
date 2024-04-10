@@ -51,7 +51,7 @@ build {
     ]
   }
   provisioner "ansible" {
-    playbook_file = "ansible/playbook/packer_db.yml"
+    playbook_file = "ansible/playbooks/packer_db.yml"
     extra_arguments = [
       "--extra-vars",
       "ansible_python_interpreter=/usr/bin/python2.7"]
