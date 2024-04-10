@@ -323,97 +323,173 @@ solution: need add "sleep" after commands
 - Создана новая ветка
 - Закомменчен код для провижнов в терраформе
 - Протестированы один плейбук, один сценарий:
-	Плейбуки
-    Сценарий плейбука
-    Сценарий для MongoDB
-    Шаблон конфига MongoDB
-    Пробный, тестовый прогон
-		ansible-playbook reddit_app.yml --check
-        ansible-playbook reddit_app.yml --check --limit db
-    Определение переменных
-    Корректировка 2-х темплейтов для mongod и mongodb
-    Пробный прогон
-    Handlers
-    Добавлены handlers
-    Применим плейбук
-        ansible-playbook  reddit_app.yml  --limit db
-    Настройка инстанса приложения
-    Unit для приложения
-    Добавлен шаблон для приложения
-    Настройка инстанса приложения
-		ansible-playbook reddit_app.yml --check --limit db --tags db-tag
-		ansible-playbook reddit_app.yml --check --limit app --tags app-tag
-		ansible-playbook reddit_app.yml --limit app --tags app-tag
-	Деплой
-    Выполняем деплой
-		ansible-playbook reddit_app.yml --check --limit app --tags deploy-tag
-		ansible-playbook reddit_app.yml --limit app --tags deploy-tag
-    Проверяем работу приложения
+
+Плейбуки
+
+Сценарий плейбука
+
+Сценарий для MongoDB
+
+Шаблон конфига MongoDB
+
+Пробный, тестовый прогон
+	```
+	ansible-playbook reddit_app.yml --check
+	ansible-playbook reddit_app.yml --check --limit db
+	```
+Определение переменных
+
+Корректировка 2-х темплейтов для mongod и mongodb
+
+Пробный прогон
+Handlers
+Добавлены handlers
+Применим плейбук
+	```
+	ansible-playbook  reddit_app.yml  --limit db
+	```
+Настройка инстанса приложения
+Unit для приложения
+Добавлен шаблон для приложения
+Настройка инстанса приложения
+	```
+	ansible-playbook reddit_app.yml --check --limit db --tags db-tag
+	ansible-playbook reddit_app.yml --check --limit app --tags app-tag
+	ansible-playbook reddit_app.yml --limit app --tags app-tag
+	```
+Деплой
+Выполняем деплой
+	```
+	ansible-playbook reddit_app.yml --check --limit app --tags deploy-tag
+	ansible-playbook reddit_app.yml --limit app --tags deploy-tag
+	```
+Проверяем работу приложения
 
 - Протестированы один плейбук, много сценариев
-    Пересоздадим инфраструктуру
-    Проверим работу сценариев
-        ansible-playbook reddit_app2.yml --tags db-tag --check
-        ansible-playbook reddit_app2.yml --tags db-tag
-        ansible-playbook reddit_app2.yml --tags app-tag --check
-        ansible-playbook reddit_app2.yml --tags app-tag
-    Сценарий для деплоя
-        ansible-playbook reddit_app2.yml --tags app-tag
-    Проверка сценария
-        ansible-playbook reddit_app2.yml --tags deploy-tag --check
+Пересоздадим инфраструктуру
+Проверим работу сценариев
+	```
+	ansible-playbook reddit_app2.yml --tags db-tag --check
+	ansible-playbook reddit_app2.yml --tags db-tag
+	ansible-playbook reddit_app2.yml --tags app-tag --check
+	ansible-playbook reddit_app2.yml --tags app-tag
+	```
+Сценарий для деплоя
+	```
+	ansible-playbook reddit_app2.yml --tags app-tag
+	```
+Проверка сценария
+	```
+	ansible-playbook reddit_app2.yml --tags deploy-tag --check
+	```
 
 - Несколько плейбуков
-	db.yml
-    app.yml
-    deploy.yml
-    site.yml
-    Проверка результата
-        ansible-playbook site.yml --check
-        ansible-playbook site.yml
+db.yml
+app.yml
+deploy.yml
+site.yml
+Проверка результата
+	```
+	ansible-playbook site.yml --check
+	ansible-playbook site.yml
+	```
 
 - Созданы новые образы при помощи пакера
-	Изменен провижн образов Packer на Ansible-плейбуки
-        ```
-		ansible-playbook --check packer_db.yml
-        ansible-playbook --check packer_app.yml
-		```
-	Интегрируем Ansible в Packer
-    Проверяем образы
-		```
-		packer validate -var-file=variables.pkr.hcl db.pkr.hcl
-        packer validate -var-file=variables.pkr.hcl app.pkr.hcl
-		```
-	Для настройки плагина понадобилось добавить в config.hcl информацию о плагине ансибла
-		```
-		packer init -var-file=variables.pkr.hcl app.pkr.hcl
-		packer validate -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
-		packer validate -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
-		```
-	Так же ансибл ругался на версию питона на хосте, через шелл был установлен питон 2 и указано его использование
-		```
-		extra_arguments = [
-			"--extra-vars",
-			"ansible_python_interpreter=/usr/bin/python2.7"]
-		```
-	Помогло но не совсем, поэтому на своей вм был удалён ансибл и установлен через apt, после этого образ стал корректно работать
-		```
-		packer build -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
-        packer build -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
-		yc compute image list
-		```
-	Меняем id образов в переменных терраформа и запускаем создание инфры
-		```
-		terraform/stage> terraform destroy
-        terraform/stage> terraform apply -auto-approve
-		```
-	Проверяем работу плейбука
-		```
-		ansible-playbook site.yml --check
-		```
-	Выдает ошибку, т.к. нет сервиса пумы, но при применении плейбука всё отрабатывает
-		```
-		ansible-playbook site.yml
-		```
+Изменен провижн образов Packer на Ansible-плейбуки
+	```
+	ansible-playbook --check packer_db.yml
+	ansible-playbook --check packer_app.yml
+	```
+Интегрируем Ansible в Packer
+Проверяем образы
+	```
+	packer validate -var-file=variables.pkr.hcl db.pkr.hcl
+	packer validate -var-file=variables.pkr.hcl app.pkr.hcl
+	```
+Для настройки плагина понадобилось добавить в config.hcl информацию о плагине ансибла
+	```
+	packer init -var-file=variables.pkr.hcl app.pkr.hcl
+	packer validate -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
+	packer validate -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
+	```
+Так же ансибл ругался на версию питона на хосте, через шелл был установлен питон 2 и указано его использование
+	```
+	extra_arguments = [
+		"--extra-vars",
+		"ansible_python_interpreter=/usr/bin/python2.7"]
+	```
+Помогло но не совсем, поэтому на своей вм был удалён ансибл и установлен через apt, после этого образ стал корректно работать
+	```
+	packer build -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
+	packer build -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
+	yc compute image list
+	```
+Меняем id образов в переменных терраформа и запускаем создание инфры
+	```
+	terraform/stage> terraform destroy
+	terraform/stage> terraform apply -auto-approve
+	```
+Проверяем работу плейбука
+	```
+	ansible-playbook site.yml --check
+	```
+Выдает ошибку, т.к. нет сервиса пумы, но при применении плейбука всё отрабатывает
+	```
+	ansible-playbook site.yml
+	```
 
 - Проверяем работу
-	'внешний адрес':9292
+'внешний адрес':9292
+
+
+# Homework 10
+- Создана новая ветка
+- Созданы роли
+	```
+	ansible-galaxy init app
+	ansible-galaxy init db
+	```
+
+- Созданы и сконфигурированы два окружения
+	```
+	ansible-playbook -i environments/prod/inventory deploy.yml
+	```
+
+Дефолтное окружение задано в ansible.cfg
+
+- Определены групповые переменные
+- Организован отдельный каталог для плейбуков, весь "мусор" разнесен по каталогам
+- Организована комьюнити-роль nginx
+	```
+	ansible-galaxy install -r environments/stage/requirements.yml
+	```
+
+- Изучена возможность открития портов в группах безопасности (по дефолту у нас сейчас всё открыто)
+	```
+	resource "yandex_vpc_security_group_rule" "rule1" {
+	  security_group_binding = <идентификатор_группы_безопасности>
+	  direction              = "ingress"
+	  description            = "<описание_правила>"
+	  v4_cidr_blocks         = ["10.0.1.0/24", "10.0.2.0/24"]
+	  port                   = 8080
+	  protocol               = "TCP"
+	}
+	```
+
+- Настроен ansible-vault для окружений
+	```
+	touch vault.key
+	vim ansible.cfg
+		vault_password_file = vault.key
+	```
+
+- Добавлены креды и плейбук для создания юзеров
+- С помощью ansible.vault креды зашифрованы
+	```
+	ansible-vault encrypt environments/prod/credentials.yml
+	ansible-vault encrypt environments/stage/credentials.yml
+	ansible-vault edit <file> - редактирование
+	ansible-vault decrypt <file> - расшифровка
+	```
+
+- Добавлен вызов плейбука на создание пользователей в site.yml

@@ -17,3 +17,7 @@ terraform.tfvars
 
 # ansible hw 9
 *.retry
+
+# ansible hw 10
+#jdauphant.nginx
+vault.key
