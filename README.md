@@ -342,31 +342,40 @@ solution: need add "sleep" after commands
 Корректировка 2-х темплейтов для mongod и mongodb
 
 Пробный прогон
+
 Handlers
+
 Добавлены handlers
+
 Применим плейбук
 	```
 	ansible-playbook  reddit_app.yml  --limit db
 	```
 Настройка инстанса приложения
+
 Unit для приложения
+
 Добавлен шаблон для приложения
+
 Настройка инстанса приложения
 	```
 	ansible-playbook reddit_app.yml --check --limit db --tags db-tag
 	ansible-playbook reddit_app.yml --check --limit app --tags app-tag
 	ansible-playbook reddit_app.yml --limit app --tags app-tag
 	```
-Деплой
+
 Выполняем деплой
 	```
 	ansible-playbook reddit_app.yml --check --limit app --tags deploy-tag
 	ansible-playbook reddit_app.yml --limit app --tags deploy-tag
 	```
+
 Проверяем работу приложения
 
 - Протестированы один плейбук, много сценариев
+
 Пересоздадим инфраструктуру
+
 Проверим работу сценариев
 	```
 	ansible-playbook reddit_app2.yml --tags db-tag --check
@@ -374,10 +383,12 @@ Unit для приложения
 	ansible-playbook reddit_app2.yml --tags app-tag --check
 	ansible-playbook reddit_app2.yml --tags app-tag
 	```
+
 Сценарий для деплоя
 	```
 	ansible-playbook reddit_app2.yml --tags app-tag
 	```
+
 Проверка сценария
 	```
 	ansible-playbook reddit_app2.yml --tags deploy-tag --check
@@ -400,39 +411,47 @@ site.yml
 	ansible-playbook --check packer_db.yml
 	ansible-playbook --check packer_app.yml
 	```
+
 Интегрируем Ansible в Packer
+
 Проверяем образы
 	```
 	packer validate -var-file=variables.pkr.hcl db.pkr.hcl
 	packer validate -var-file=variables.pkr.hcl app.pkr.hcl
 	```
+
 Для настройки плагина понадобилось добавить в config.hcl информацию о плагине ансибла
 	```
 	packer init -var-file=variables.pkr.hcl app.pkr.hcl
 	packer validate -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
 	packer validate -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
 	```
+
 Так же ансибл ругался на версию питона на хосте, через шелл был установлен питон 2 и указано его использование
 	```
 	extra_arguments = [
 		"--extra-vars",
 		"ansible_python_interpreter=/usr/bin/python2.7"]
 	```
+
 Помогло но не совсем, поэтому на своей вм был удалён ансибл и установлен через apt, после этого образ стал корректно работать
 	```
 	packer build -var-file=packer/variables.pkr.hcl packer/db.pkr.hcl
 	packer build -var-file=packer/variables.pkr.hcl packer/app.pkr.hcl
 	yc compute image list
 	```
+
 Меняем id образов в переменных терраформа и запускаем создание инфры
 	```
 	terraform/stage> terraform destroy
 	terraform/stage> terraform apply -auto-approve
 	```
+
 Проверяем работу плейбука
 	```
 	ansible-playbook site.yml --check
 	```
+
 Выдает ошибку, т.к. нет сервиса пумы, но при применении плейбука всё отрабатывает
 	```
 	ansible-playbook site.yml
@@ -493,3 +512,64 @@ site.yml
 	```
 
 - Добавлен вызов плейбука на создание пользователей в site.yml
+
+
+# Homework 11
+- Создана новая ветка
+- Установлен вагрант через apt install
+- Установлен virtual box
+Добавлен конфиг для сети 10.0 в /etc/vbox/networks.config
+
+- В Vagrantfile добавлена строка для скачивания образов
+	```
+	ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+	vagrant init
+	vagrant up
+	vagrant box list
+	vagrant status
+	vagrant ssh 'server_name'
+	vagrant destroy -f
+	```
+
+- Добавлена роль ансибла
+	```
+	vagrant provision 'server_name'
+	```
+
+- Создан плейбук с установкой питона 2 (ЗЫ у меня такой ошибки не выдавало)
+- Доработаны роли
+- Для корректной работы оператива на вм увеличина до 2гб
+- Просмотрен инвентори вагранта
+	```
+	cat .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
+	```
+
+- Добавлена extra_vars для nginx
+	```
+	"nginx_sites" => { "default" => [ "listen 80", "server_name reddit", "location / { proxy_pass http://127.0.0.1:9292; }" ]  }
+	```
+
+- Установлен molecule. Для ансибла 6.7 (core 2.13.13). molecule_vagrant 2.0.0
+	```
+	python3 -m pip install --user molecule==3.5.1
+
+	molecule init scenario default -r db -d vagrant
+	molecule create
+	molecule list
+	molecule login -h instance
+	```
+
+- Для моей версии molecule меняем плейбук converge.yml и прогоняем тесты
+	```
+	molecule converge
+	molecule verify
+	```
+
+- Добавлена проверка порта
+	```
+	def test_mongo_port(host):
+    assert host.socket('tcp://0.0.0.0:27017').is_listening
+	```
+- Скопированы конфиги и измененый плейбуки пакера (добавлены роли)
+- Изменены конфиги пакера

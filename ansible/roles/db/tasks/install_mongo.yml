@@ -1,0 +1,9 @@
+- name: Install mongodb package
+  apt:
+    name: mongodb
+    update_cache: yes
+    state: present
+  tags: install
+
+- name: enable mongodb
+  systemd: name=mongodb enabled=yes

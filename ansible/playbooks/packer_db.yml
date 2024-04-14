@@ -2,12 +2,6 @@
 - name: Provisioning mongoDB
   hosts: all
   become: true
-  vars:
-  tasks:
-    - name: Update repositories cache and install "mongodb" package
-      apt:
-        name: mongodb
-        update_cache: yes
 
-    - name: enable mongodb
-      systemd: name=mongodb enabled=yes
+  roles:
+    - db
