@@ -21,3 +21,11 @@ terraform.tfvars
 # ansible hw 10
 #jdauphant.nginx
 vault.key
+
+# ansible hw 11
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
